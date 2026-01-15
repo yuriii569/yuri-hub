@@ -1,6 +1,6 @@
---====================================
--- YURI HUB | ESTILO ANTIGO ESTÁVEL
---====================================
+--==============================
+-- YURI HUB | FINAL ESTÁVEL
+--==============================
 
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
@@ -14,12 +14,12 @@ local AUTOLOAD = false
 local savedPos
 local fly, infJump, noclip, esp = false,false,false,false
 
--- AUTOLOAD REEXEC
+-- AUTOLOAD
 if getgenv().YuriAutoLoad then
 	getgenv().YuriAutoLoad()
 end
 
--- RESET GUI
+-- LIMPAR GUI
 if game.CoreGui:FindFirstChild("YuriHub") then
 	game.CoreGui.YuriHub:Destroy()
 end
@@ -41,13 +41,13 @@ open.Draggable = true
 
 -- MAIN
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.fromOffset(520,340)
+main.Size = UDim2.fromOffset(560,360)
 main.Position = UDim2.fromScale(0.5,0.5)
 main.AnchorPoint = Vector2.new(0.5,0.5)
 main.BackgroundColor3 = Color3.new(0,0,0)
 main.Visible = false
 
--- RGB BORDA
+-- BORDA RGB
 RunService.RenderStepped:Connect(function()
 	local c = Color3.fromHSV(tick()%5/5,1,1)
 	main.BorderColor3 = c
@@ -74,10 +74,9 @@ close.BackgroundColor3 = Color3.new(0,0,0)
 local keyFrame = Instance.new("Frame", main)
 keyFrame.Size = UDim2.new(1,0,1,-40)
 keyFrame.Position = UDim2.fromOffset(0,40)
-keyFrame.BackgroundTransparency = 1
 
 local keyBox = Instance.new("TextBox", keyFrame)
-keyBox.Size = UDim2.fromOffset(220,40)
+keyBox.Size = UDim2.fromOffset(240,40)
 keyBox.Position = UDim2.fromScale(0.5,0.45)
 keyBox.AnchorPoint = Vector2.new(0.5,0.5)
 keyBox.PlaceholderText = "Digite a key"
@@ -85,19 +84,18 @@ keyBox.BackgroundColor3 = Color3.new(0,0,0)
 keyBox.TextColor3 = Color3.new(1,1,1)
 
 local keyBtn = Instance.new("TextButton", keyFrame)
-keyBtn.Size = UDim2.fromOffset(220,40)
+keyBtn.Size = UDim2.fromOffset(240,40)
 keyBtn.Position = UDim2.fromScale(0.5,0.6)
 keyBtn.AnchorPoint = Vector2.new(0.5,0.5)
 keyBtn.Text = "Entrar"
 keyBtn.BackgroundColor3 = Color3.new(0,0,0)
 keyBtn.TextColor3 = Color3.new(1,1,1)
 
--- CONTENT
+-- CONTEÚDO
 local content = Instance.new("Frame", main)
 content.Size = UDim2.new(1,0,1,-40)
 content.Position = UDim2.fromOffset(0,40)
 content.Visible = false
-content.BackgroundTransparency = 1
 
 -- ABAS EM CIMA
 local tabBar = Instance.new("Frame", content)
@@ -106,35 +104,44 @@ tabBar.BackgroundColor3 = Color3.new(0,0,0)
 
 local pages = {}
 
-local function newTab(name,x)
-	local b = Instance.new("TextButton", tabBar)
-	b.Size = UDim2.fromOffset(120,40)
-	b.Position = UDim2.fromOffset(x,0)
-	b.Text = name
-	b.BackgroundColor3 = Color3.new(0,0,0)
-	b.TextColor3 = Color3.new(1,1,1)
+local function createTab(name, x)
+	local btn = Instance.new("TextButton", tabBar)
+	btn.Size = UDim2.fromOffset(140,40)
+	btn.Position = UDim2.fromOffset(x,0)
+	btn.Text = name
+	btn.BackgroundColor3 = Color3.new(0,0,0)
+	btn.TextColor3 = Color3.new(1,1,1)
 
-	local p = Instance.new("Frame", content)
-	p.Size = UDim2.fromOffset(520,220)
-	p.Position = UDim2.fromOffset(0,40)
-	p.Visible = false
-	p.BackgroundTransparency = 1
+	local page = Instance.new("Frame", content)
+	page.Size = UDim2.fromOffset(560,280)
+	page.Position = UDim2.fromOffset(0,40)
+	page.Visible = false
 
-	b.MouseButton1Click:Connect(function()
-		for _,v in pairs(pages) do v.Visible=false end
-		p.Visible=true
+	btn.MouseButton1Click:Connect(function()
+		for _,p in pairs(pages) do p.Visible=false end
+		page.Visible=true
 	end)
 
-	table.insert(pages,p)
-	return p
+	table.insert(pages,page)
+	return page
 end
 
 -- TELEPORT
-local tp = newTab("Teleport",0)
+local tp = createTab("Teleport",0)
 
+-- CONFIG
+local cfg = createTab("Config",140)
+
+-- ESP
+local espTab = createTab("ESP",280)
+
+-- SERVER
+local server = createTab("Server",420)
+
+-- TELEPORT BOTÕES
 local mark = Instance.new("TextButton", tp)
 mark.Size = UDim2.fromOffset(260,40)
-mark.Position = UDim2.fromOffset(130,30)
+mark.Position = UDim2.fromOffset(150,40)
 mark.Text = "Marcar Posição"
 mark.BackgroundColor3 = Color3.new(0,0,0)
 mark.TextColor3 = Color3.new(1,1,1)
@@ -146,7 +153,7 @@ end)
 
 local tpBtn = mark:Clone()
 tpBtn.Parent = tp
-tpBtn.Position = UDim2.fromOffset(130,80)
+tpBtn.Position = UDim2.fromOffset(150,90)
 tpBtn.Text = "Teleportar"
 
 tpBtn.MouseButton1Click:Connect(function()
@@ -154,12 +161,34 @@ tpBtn.MouseButton1Click:Connect(function()
 	if hrp and savedPos then hrp.CFrame = savedPos end
 end)
 
--- SERVER
-local server = newTab("Server",120)
+-- GO BASE
+local base = mark:Clone()
+base.Parent = tp
+base.Position = UDim2.fromOffset(150,140)
+base.Text = "Go Base"
 
+base.MouseButton1Click:Connect(function()
+	player.Character:BreakJoints()
+end)
+
+-- CONFIG BOTÕES
+local speed = Instance.new("TextBox", cfg)
+speed.Size = UDim2.fromOffset(260,40)
+speed.Position = UDim2.fromOffset(150,40)
+speed.PlaceholderText = "Velocidade (max 200)"
+speed.BackgroundColor3 = Color3.new(0,0,0)
+speed.TextColor3 = Color3.new(1,1,1)
+
+speed.FocusLost:Connect(function()
+	local hum = player.Character and player.Character:FindFirstChild("Humanoid")
+	local v = tonumber(speed.Text)
+	if hum and v and v <= 200 then hum.WalkSpeed = v end
+end)
+
+-- SERVER BOTÕES
 local hop = Instance.new("TextButton", server)
 hop.Size = UDim2.fromOffset(260,40)
-hop.Position = UDim2.fromOffset(130,40)
+hop.Position = UDim2.fromOffset(150,40)
 hop.Text = "Server Hop"
 hop.BackgroundColor3 = Color3.new(0,0,0)
 hop.TextColor3 = Color3.new(1,1,1)
@@ -167,7 +196,7 @@ hop.TextColor3 = Color3.new(1,1,1)
 hop.MouseButton1Click:Connect(function()
 	if AUTOLOAD then
 		getgenv().YuriAutoLoad = function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/yuriii569/yuri-hub/main/yurihub.lua"))()
+			loadstring(game:HttpGet("SEU_LINK_RAW_AQUI"))()
 		end
 	end
 	TeleportService:Teleport(game.PlaceId, player)
@@ -175,7 +204,7 @@ end)
 
 local auto = hop:Clone()
 auto.Parent = server
-auto.Position = UDim2.fromOffset(130,90)
+auto.Position = UDim2.fromOffset(150,90)
 auto.Text = "Auto Load : OFF"
 
 auto.MouseButton1Click:Connect(function()
@@ -200,4 +229,3 @@ end)
 close.MouseButton1Click:Connect(function()
 	main.Visible = false
 end)
-
